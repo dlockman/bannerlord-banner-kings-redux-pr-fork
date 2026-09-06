@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
-using static BannerKings.Managers.PopulationManager;
+using TaleWorlds.CampaignSystem.CharacterDevelopment;
 
 namespace BannerKings.Utils
 {
@@ -19,7 +16,7 @@ namespace BannerKings.Utils
     {
         private static bool _resolved;
         private static Dictionary<string, int> _grudgeDict;
-
+        private static Random _random = new Random();
         /// <summary>True if Fourberie is loaded and it can access needed functionality.</summary>
         public static bool Available
         {
@@ -41,6 +38,14 @@ namespace BannerKings.Utils
         public static void SetGrudgeValue(Clan clan, int amount)
         {
             _grudgeDict[clan.StringId] = amount;
+        }
+
+        public static void ConsiderFourberieGrudge(Hero character, Clan target)
+        {
+            int scheming = Math.Abs(character.GetTraitLevel(DefaultTraits.Honor) - 2);
+            int grudgeAdd = _random.Next(0, 21) * scheming;
+            int existingGrudge = GetExistingGrudge(target);
+            SetGrudgeValue(target, existingGrudge + grudgeAdd);
         }
 
         private static void Resolve()

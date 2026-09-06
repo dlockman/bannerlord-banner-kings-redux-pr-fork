@@ -123,14 +123,14 @@ namespace BannerKings.Behaviours.Diplomacy
                             .SetTextVariable("CLAN", clan.Name)
                             .ToString()));
                     }
-                    // Grudge degrades pretty rapidly and almost never gets to even half of 250 ceiling, hence high weighting below
-                    // to have an even remotely noticable effect.
+                    // Grudge degrades pretty rapidly and almost never gets to even half of the 250 ceiling for clans in same kindom,
+                    // hence high weighting below to have an even remotely noticable effect.
                     grudgeFactor = existingGrudge / 250f;
                 }
 
 
 
-                float score = tierCloseness * 0.5f + relationFactor * 0.8f + peerAmbition * 0.4f + grudgeFactor * 1.6f;
+                float score = tierCloseness * 0.5f + relationFactor * 0.8f + peerAmbition * 0.4f + grudgeFactor * 2f;
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -263,6 +263,12 @@ namespace BannerKings.Behaviours.Diplomacy
                         .SetTextVariable("KINGDOM", kingdom.Name)
                         .ToString(),
                     Color.FromUint(Utils.TextHelper.COLOR_LIGHT_RED)));
+            }
+
+            // In addition to normal BK lever pull, also build Fourberie grudge against vassal depending on honor.
+            if (FourberieBridge.Available && treacherous && rival == Clan.PlayerClan)
+            {
+                FourberieBridge.ConsiderFourberieGrudge(clan.Leader, rival);
             }
         }
 
