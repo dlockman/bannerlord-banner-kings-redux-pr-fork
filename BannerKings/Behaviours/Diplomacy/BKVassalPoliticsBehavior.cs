@@ -3,6 +3,7 @@ using BannerKings.Extensions;
 using BannerKings.Managers.Titles;
 using BannerKings.Managers.Titles.Governments;
 using BannerKings.Settings;
+using BannerKings.Utils;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -104,8 +105,32 @@ namespace BannerKings.Behaviours.Diplomacy
                 int relation = clan.Leader.GetRelation(peer.Leader);
                 float relationFactor = relation < 0 ? -relation / 100f : 0f;
                 float peerAmbition = MathF.Max(0f, BKPoliticalDisposition.Get(peer).Ambition);
+                float grudgeFactor = 0f;
 
-                float score = tierCloseness * 0.5f + relationFactor * 0.8f + peerAmbition * 0.4f;
+                // Clans consider grudge against player when choosing a rival.
+                if (FourberieBridge.Available && peer == Clan.PlayerClan)
+                {
+                    int existingGrudge = FourberieBridge.GetExistingGrudge(clan);
+                    if (existingGrudge > 0)
+                    {
+                        InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=D50E4DZk}{CLAN} sees you as a rival due to grudge!")
+                            .SetTextVariable("CLAN", clan.Name)
+                            .ToString()));
+                    }
+                    else
+                    {
+                        InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=D50E4DZk}{CLAN} has no grudge against you!")
+                            .SetTextVariable("CLAN", clan.Name)
+                            .ToString()));
+                    }
+                    // Grudge degrades pretty rapidly and almost never gets to even half of 250 ceiling, hence high weighting below
+                    // to have an even remotely noticable effect.
+                    grudgeFactor = existingGrudge / 250f;
+                }
+
+
+
+                float score = tierCloseness * 0.5f + relationFactor * 0.8f + peerAmbition * 0.4f + grudgeFactor * 1.6f;
                 if (score > bestScore)
                 {
                     bestScore = score;
