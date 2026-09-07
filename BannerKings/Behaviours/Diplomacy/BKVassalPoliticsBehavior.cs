@@ -111,18 +111,7 @@ namespace BannerKings.Behaviours.Diplomacy
                 if (FourberieBridge.Available && peer == Clan.PlayerClan)
                 {
                     int existingGrudge = FourberieBridge.GetExistingGrudge(clan);
-                    if (existingGrudge > 0)
-                    {
-                        InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=D50E4DZk}{CLAN} sees you as a rival due to grudge!")
-                            .SetTextVariable("CLAN", clan.Name)
-                            .ToString()));
-                    }
-                    else
-                    {
-                        InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=D50E4DZk}{CLAN} has no grudge against you!")
-                            .SetTextVariable("CLAN", clan.Name)
-                            .ToString()));
-                    }
+
                     // Grudge degrades pretty rapidly and almost never gets to even half of the 250 ceiling for clans in same kindom,
                     // hence high weighting below to have an even remotely noticable effect.
                     grudgeFactor = existingGrudge / 250f;
